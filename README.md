@@ -1,46 +1,114 @@
-# Getting Started with Create React App
+# EBAC Sports
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Loja virtual de artigos esportivos desenvolvida em React. O catálogo é carregado de uma API externa; o usuário pode favoritar produtos e adicioná-los ao carrinho, com o resumo exibido no cabeçalho da página.
 
-## Available Scripts
+Projeto do curso EBAC, com gerenciamento de estado global via **Redux Toolkit**.
 
-In the project directory, you can run:
+## Funcionalidades
 
-### `npm start`
+- Listagem de produtos com imagem, nome e preço (formatado em Real)
+- Adicionar produtos aos **favoritos** (toggle: adicionar ou remover)
+- Adicionar produtos ao **carrinho**, com alerta se o item já estiver incluído
+- **Header** com contagem de favoritos, quantidade de itens no carrinho e valor total
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Tecnologias
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+- [React](https://react.dev/) 18
+- [TypeScript](https://www.typescriptlang.org/)
+- [Redux Toolkit](https://redux-toolkit.js.org/) + [React Redux](https://react-redux.js.org/)
+- [Styled Components](https://styled-components.com/)
+- [Create React App](https://create-react-app.dev/)
 
-### `npm test`
+## Gerenciamento de estado (Redux)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+O estado global fica na store Redux, dividido em três slices:
 
-### `npm run build`
+| Slice       | Responsabilidade                                      |
+| ----------- | ----------------------------------------------------- |
+| `produtos`  | Lista da API, loading e erro (`fetchProdutos` async)  |
+| `carrinho`  | Itens adicionados ao carrinho                         |
+| `favoritos` | Itens marcados como favoritos                         |
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Os componentes consomem o estado com `useAppSelector` e disparam ações com `useAppDispatch` (hooks tipados em `src/store/hooks.ts`).
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```
+src/
+├── types/
+│   └── produto.ts          # Tipo Produto
+├── store/
+│   ├── index.ts            # configureStore
+│   ├── hooks.ts            # useAppDispatch / useAppSelector
+│   └── slices/
+│       ├── produtosSlice.ts
+│       ├── carrinhoSlice.ts
+│       └── favoritosSlice.ts
+├── components/
+│   ├── Header/             # Resumo do carrinho e favoritos
+│   └── Produto/            # Card de um produto
+├── containers/
+│   └── Produtos.tsx        # Lista e lógica de dispatch
+├── App.tsx                 # Bootstrap (fetch inicial)
+└── index.tsx               # Provider do Redux
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## API
 
-### `npm run eject`
+Os produtos são obtidos em:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```
+GET https://api-ebac.vercel.app/api/ebac_sports
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Cada item retornado segue o formato:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```ts
+{
+  id: number
+  nome: string
+  preco: number
+  imagem: string
+}
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Como executar
 
-## Learn More
+Pré-requisitos: [Node.js](https://nodejs.org/) (versão LTS recomendada) e npm.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+# Instalar dependências
+npm install
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+# Ambiente de desenvolvimento (http://localhost:3000)
+npm start
+
+# Build de produção
+npm run build
+
+# Testes
+npm test
+```
+
+## Scripts disponíveis
+
+| Comando         | Descrição                          |
+| --------------- | ---------------------------------- |
+| `npm start`     | Servidor de desenvolvimento        |
+| `npm run build` | Build otimizado para produção      |
+| `npm test`      | Executa os testes (Jest + Testing Library) |
+| `npm run eject` | Expõe a config do CRA (irreversível) |
+
+## Estrutura de pastas (resumo)
+
+```
+henrique_ebac_sports/
+├── public/
+├── src/
+│   ├── assets/             # Imagens estáticas (ex.: ícone do carrinho)
+│   ├── components/
+│   ├── containers/
+│   ├── store/
+│   ├── styles/
+│   └── types/
+├── package.json
+└── README.md
+```
